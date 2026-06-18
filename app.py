@@ -43,21 +43,18 @@ with col2:
     prod_cat_3 = st.slider("Tertiary Product Category (Optional, 0 if None)", 0, 20, 0)
 
 if st.button("Generate Optimization Metrics"):
-    # Encode inputs
+
     gender_enc = artifacts["encoders"]["Gender"].transform([gender])[0]
     age_enc = artifacts["encoders"]["Age"].transform([age])[0]
     city_enc = artifacts["encoders"]["City_Category"].transform([city_cat])[0]
     stay_numeric = int(stay_years.replace('+', ''))
     marital_numeric = 1 if marital == "Married" else 0
     
-    # Assembly vectors
     demographic_vector = np.array([[gender_enc, age_enc, occupation, city_enc, stay_numeric, marital_numeric]])
     
-    # Formulate cluster group assignment dynamically
     scaled_demo = artifacts["scaler"].transform(demographic_vector)
     assigned_cluster = artifacts["kmeans"].transform(scaled_demo).argmin(axis=1)[0]
     
-    # Final target predictive inference payload assembly
     full_input_payload = pd.DataFrame([{
         'Gender': gender_enc, 'Age': age_enc, 'Occupation': occupation,
         'City_Category': city_enc, 'Stay_In_Current_City_Years': stay_numeric,
@@ -66,11 +63,9 @@ if st.button("Generate Optimization Metrics"):
         'User_Cluster': assigned_cluster
     }])
     
-    # Generate prediction safely mapping correct order structure array formats
     final_features_ordered = full_input_payload[artifacts["features"]]
     predicted_spend = artifacts["model"].predict(final_features_ordered)[0]
     
-    # Cluster UI display definitions
     cluster_names = {0: "Budget-Conscious Browser", 1: "Mainstream Consistent Consumer", 2: "High-Value Power Shopper"}
     
     st.markdown("---")
