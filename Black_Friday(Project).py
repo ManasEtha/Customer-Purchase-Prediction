@@ -21,9 +21,8 @@ def generate_black_friday_data(filename, num_rows, is_train=True):
     df = pd.DataFrame(data)
     
     if is_train:
-        # Generate base purchase amount and add slight noise based on demographics
-        base_purchase = np.random.normal(9000, 3000, size=num_rows)
-        # Men and specific product categories tend to spend slightly more in this dataset logic
+    
+        base_purchase = np.random.normal(9000, 3000, size=num_rows)     
         gender_modifier = np.where(df['Gender'] == 'M', 1200, 0)
         cat_modifier = df['Product_Category_1'] * 150
         df['Purchase'] = np.abs(base_purchase + gender_modifier + cat_modifier).astype(int)
@@ -31,6 +30,5 @@ def generate_black_friday_data(filename, num_rows, is_train=True):
     df.to_csv(filename, index=False)
     print(f"Generated {filename} with {num_rows} rows.")
 
-# Generate datasets
 generate_black_friday_data('blackfriday_train.csv', num_rows=10000, is_train=True)
 generate_black_friday_data('blackfriday_test.csv', num_rows=2000, is_train=False)
